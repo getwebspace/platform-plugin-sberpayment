@@ -13,6 +13,7 @@ class SberbankPaymentPlugin extends AbstractPaymentPlugin
     const NAME = 'SberbankPaymentPlugin';
     const TITLE = 'SberbankPayment';
     const DESCRIPTION = 'Возможность принимать безналичную оплату товаров и услуг';
+    const VERSION = '1.0.1';
 
     public function __construct(ContainerInterface $container)
     {
@@ -47,7 +48,7 @@ class SberbankPaymentPlugin extends AbstractPaymentPlugin
                 'pattern' => '/cart/done/sp/result',
                 'handler' => \Plugin\SberbankPayment\Actions\ResultAction::class,
             ])
-            ->setName('common:sp:success');
+            ->setName('common:sp:result');
     }
 
     public function getRedirectURL(Order $order): ?string
@@ -90,8 +91,8 @@ class SberbankPaymentPlugin extends AbstractPaymentPlugin
             ],
         ]));
 
-        $this->logger->debug('SberbankPayment: request', ['url' => $url, 'data' => $data]);
-        $this->logger->debug('SberbankPayment: response', ['headers' => $http_response_header, 'response' => $result]);
+        // $this->logger->debug('SberbankPayment: request', ['url' => $url, 'data' => $data]);
+        // $this->logger->debug('SberbankPayment: response', ['headers' => $http_response_header, 'response' => $result]);
 
         if ($result) {
             $json = json_decode($result, true);
