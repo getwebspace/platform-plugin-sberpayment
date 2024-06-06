@@ -2,7 +2,7 @@
 
 namespace Plugin\SberbankPayment;
 
-use App\Domain\Entities\Catalog\Order;
+use App\Domain\Models\CatalogOrder;
 use App\Domain\Plugin\AbstractPaymentPlugin;
 use Psr\Container\ContainerInterface;
 
@@ -13,7 +13,7 @@ class SberbankPaymentPlugin extends AbstractPaymentPlugin
     const NAME = 'SberbankPaymentPlugin';
     const TITLE = 'SberbankPayment';
     const DESCRIPTION = 'Возможность принимать безналичную оплату товаров и услуг';
-    const VERSION = '1.0.1';
+    const VERSION = '2.0.0';
 
     public function __construct(ContainerInterface $container)
     {
@@ -51,19 +51,19 @@ class SberbankPaymentPlugin extends AbstractPaymentPlugin
             ->setName('common:sp:result');
     }
 
-    public function getRedirectURL(Order $order): ?string
+    public function getRedirectURL(CatalogOrder $order): ?string
     {
-        $this->logger->debug('SberbankPayment: register order', ['serial' => $order->getSerial()]);
+        $this->logger->debug('SberbankPayment: register order', ['serial' => $order->serial]);
 
         // регистрация заказа
         $result = $this->request('payment/rest/register.do', [
             'userName' => $this->parameter('SberbankPaymentPlugin_login'),
             'password' => $this->parameter('SberbankPaymentPlugin_password'),
-            'orderNumber' => $order->getSerial(),
-            'amount' => intval($order->getTotalPrice() * 100), // копейки
-            'description' => str_replace('{serial}', $order->getSerial(), $this->parameter('SberbankPaymentPlugin_description', '')),
+            'orderNumber' => $order->serial,
+            'amount' => intval($order->totalSum() * 100), // копейки
+            'description' => str_replace('{serial}', $order->serial, $this->parameter('SberbankPaymentPlugin_description', '')),
             'language' => 'ru',
-            'returnUrl' => $this->parameter('common_homepage') . 'cart/done/sp/result?serial=' . $order->getSerial(),
+            'returnUrl' => $this->parameter('common_homepage') . 'cart/done/sp/result?serial=' . $order->serial,
         ]);
 
         if ($result) {

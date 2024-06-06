@@ -27,18 +27,15 @@ class ResultAction extends CatalogAction
                 'userName' => $this->parameter('SberbankPaymentPlugin_login'),
                 'password' => $this->parameter('SberbankPaymentPlugin_password'),
                 'orderId' => $data['orderId'],
-                'orderNumber' => $order->getSerial(),
+                'orderNumber' => $order->serial,
                 'language' => 'ru',
             ]);
 
             if ($result && $result['OrderStatus'] == 2) {
-                $this->catalogOrderService->update($order, ['system' => 'Заказ оплачен']);
                 $this->container->get(\App\Application\PubSub::class)->publish('plugin:order:payment', $order);
-            } else {
-                $this->catalogOrderService->update($order, ['system' => 'Заказ не был оплачен']);
             }
 
-            return $this->respondWithRedirect('/cart/done/' . $order->getUuid()->toString());
+            return $this->respondWithRedirect('/cart/done/' . $order->uuid);
         }
 
         return $this->respondWithRedirect('/');
